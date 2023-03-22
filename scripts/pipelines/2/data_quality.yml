@@ -1,0 +1,17 @@
+---
+version: '3'
+services:
+  data_quality:
+    image: data_quality
+    container_name: data_quality
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    expose:
+      - 9092
+    networks: 
+      - broker-kafka
+
+networks: 
+  broker-kafka:
+    driver: bridge  

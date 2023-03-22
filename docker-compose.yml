@@ -1,0 +1,86 @@
+---
+version: '3'
+services:
+
+  # KAFKA
+  zookeeper:
+    extends:
+      file: kafka/broker.yml
+      service: zookeeper
+    networks: 
+      - broker-kafka
+    
+  broker:
+    extends:
+      file: kafka/broker.yml
+      service: broker
+    depends_on:
+      - zookeeper
+    networks: 
+      - broker-kafka
+
+  kafdrop:
+    extends:
+      file: kafka/broker.yml
+      service: kafdrop
+    depends_on:
+      - broker
+    networks: 
+      - broker-kafka
+
+  # PRODUCER
+  producer:
+    extends:
+      file: scripts/producer/producer.yml
+      service: producer
+    networks: 
+      - broker-kafka
+    volumes:
+      - ./utils:/utils
+  
+  # MONGODB
+  mongo:
+    extends:
+      file: mongodb/mongo.yml
+      service: mongo
+    networks: 
+      - mongo-network
+
+  mongo-express:
+    extends:
+      file: mongodb/mongo.yml
+      service: mongo-express
+    networks: 
+      - mongo-network
+
+  # PIPELINES (CONSUMERS)
+  pipeline_1:
+    extends:
+      file: scripts/pipelines/1/daily_agg.yml
+      service: daily_agg
+    networks: 
+      - broker-kafka
+      - mongo-network
+    volumes:
+      - ./utils:/utils
+      - ./scripts/pipelines:/pipelines
+    depends_on:
+      - producer
+
+  pipeline_2:
+    extends:
+      file: scripts/pipelines/2/data_quality.yml
+      service: data_quality
+    networks: 
+      - broker-kafka
+    volumes:
+      - ./utils:/utils
+      - ./scripts/pipelines:/pipelines
+    depends_on:
+      - producer
+
+networks: 
+  broker-kafka:
+    driver: bridge
+  mongo-network:
+    driver: bridge

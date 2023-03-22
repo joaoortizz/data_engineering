@@ -1,0 +1,17 @@
+---
+version: '3'
+services:
+  daily_agg:
+    image: daily_agg
+    container_name: daily_agg
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    expose:
+      - 9092
+    networks: 
+      - broker-kafka
+
+networks: 
+  broker-kafka:
+    driver: bridge
