@@ -1,6 +1,5 @@
 # Data Engineering Studies - Pipeline
  This project was created by João Ortiz.
- It's based on the Test described in the pdf file attached.
 
 ## Pre Requirements
 * Docker
